@@ -34,7 +34,12 @@
 						<td>{{ blog['title'] }}</td>
 						<td>{{ blog['image'] }}</td>
 						<td>{{ blog['views'] }}</td>
-						<td>{{ blog['published'] }}</td>
+						<td>
+							{% if blog['published'] == 1 %}
+								<span style="color: blue;">發佈</span>
+							{% else %}
+								<span style="color: red;">未發佈</span>
+							{% endif %}</td>
 						<td>
 
 						</td>
