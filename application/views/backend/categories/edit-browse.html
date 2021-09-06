@@ -1,0 +1,106 @@
+{% extends "backend/layouts/base.html" %}
+
+{% block title %}分類管理{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+	<!-- Page Heading -->
+	<h1 class="h3 mb-2 text-gray-800">分 類</h1>
+
+	<!-- DataTales Example -->
+	<div class="card shadow mb-4">
+		<div class="card-header py-3">
+			<h6 class="m-0 font-weight-bold text-primary">分類 - 新增/編輯</h6>
+		</div>
+		<div class="card-body">
+			<div class="table-responsive">
+				<table class="table table-bordered" id="category" width="100%" cellspacing="0">
+					<thead>
+					<tr>
+						<th>ID</th>
+						<th>名稱</th>
+						<th>操 作</th>
+					</tr>
+					</thead>
+					<tbody>
+					{% for category in categories %}
+					<tr>
+						<td>{{ category['id'] }}</td>
+						<td>{{ category['name'] }}</td>
+						<td></td>
+					</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+</div>
+{% endblock content %}
+
+{% block javascript %}
+<script>
+	$(function () {
+
+		$("#category").DataTable({
+			"responsive": true,
+			"autoWidth": false,
+			"language": {
+				url: "/static/assets/datatable/zh_TW.json"
+			},
+			'order': [
+				[0, 'desc']
+			],
+			"columns": [{
+				"width": "5%"
+			},
+				{
+					"width": "70%"
+				},
+				{
+					"width": "25%"
+				}
+			],
+			"columnDefs": [{
+				"orderable": false,
+				"targets": [2]
+			}]
+		});
+
+	});
+
+
+	function update_row(id) {
+
+		$.post('/update-category', {
+			"id": id
+		}, function(data){
+			// console.log(data)
+			$('#id').val(data.id)
+			$('#name').val(data.name)
+
+			$('#show_update').modal();
+		})
+	}
+
+	function add_row(){
+		$('#id').val('')
+		$('#name').val('')
+
+		$('#show_update').modal()
+	}
+
+	function delete_row(id) {
+		if (confirm('確定要刪除嗎？')) {
+			$.post('/delete-category', {
+					'id': id
+				},
+				function (data) {
+					location.reload();
+				})
+		}
+	}
+
+</script>
+{% endblock javascript %}
