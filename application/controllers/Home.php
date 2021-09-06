@@ -7,10 +7,17 @@ class Home extends CI_Controller
 	public function __construct()
 	{
 		parent::__construct();
+		$this->load->model('Blog_model');
 	}
 
 	public function index(){
 
-		$this->twig->output('home');
+		$blogs = $this->Blog_model->get_blogs();
+
+		$data = [
+			'blogs' => $blogs,
+		];
+
+		$this->twig->output('home', $data);
 	}
 }

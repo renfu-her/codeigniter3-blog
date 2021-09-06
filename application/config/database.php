@@ -75,9 +75,9 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
-	'username' => 'root',
-	'password' => 'hezrid5',
+	'hostname' => '139.162.63.136',
+	'username' => 'zivhsiao',
+	'password' => 'jZpWwkBZqUZsyqLWndpWnQ19HqGMvkacOQUy',
 	'database' => 'ci3-blog',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',
