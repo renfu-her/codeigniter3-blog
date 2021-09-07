@@ -2,6 +2,10 @@
 
 {% block title %}文章管理{% endblock %}
 
+{% block css %}
+<link rel="stylesheet" href="/assets/backend/css/simplemde.min.css">
+{% endblock css %}
+
 {% block content %}
 <div class="container-fluid">
 	<!-- Page Heading -->
@@ -13,6 +17,9 @@
 			<h6 class="m-0 font-weight-bold text-primary">文章 - 新增/編輯</h6>
 		</div>
 		<div class="card-body">
+			<button type="button" onclick="add_row()"
+					class="btn btn-primary"><i class="fas fa-plus-square"> 新增</i></button>
+			<br><br>
 			<div class="table-responsive">
 				<table class="table table-bordered" id="blogs" width="100%" cellspacing="0">
 					<thead>
@@ -41,7 +48,10 @@
 								<span style="color: red;">未發佈</span>
 							{% endif %}</td>
 						<td>
-
+							<button type="button" onclick="update_row({{ blog['id'] }})"
+									class="btn btn-success"><i class="fas fa-edit"></i></button>
+							<button type="button" onclick="delete_row({{ blog['id'] }})"
+									class="btn btn-danger"><i class="fas fa-trash-alt"></i></button>
 						</td>
 					</tr>
 					{% endfor %}
@@ -52,6 +62,76 @@
 	</div>
 
 </div>
+
+<div class="modal fade" id="show_update" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+	 aria-hidden="true">
+	<form method="post" id="edit_add_form">
+		<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLongTitle">更新文章</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="col-md-12">
+						<!-- general form elements -->
+						<div class="card card-primary">
+
+							<!-- /.card-header -->
+							<!-- form start -->
+
+							<div class="card-body">
+								<div class="form-group">
+									<label for="question_type">名稱 <span style="color: red">*</span></label>
+									<input class="form-control" name="title" id="title" >
+								</div>
+								<div class="form-group">
+									<label for="question_type">Slug 名稱 <span style="color: red">*</span></label>
+									<input class="form-control" name="slug" id="slug" >
+								</div>
+								<div class="form-group">
+									<label for="question_type">分類名稱 <span style="color: red">*</span></label>
+									<select class="form-control" name="category_id" id="category_id">
+										{% for category in categories %}
+											<option value="{{ category.id }}">{{ category.name }}</option>
+										{% endfor %}
+									</select>
+								</div>
+								<div class="form-group">
+									<label for="question_type">內容<span style="color: red">*</span></label>
+									<textarea class="form-control" name="content" id="content" cols="30" rows="10"></textarea>
+								</div>
+								<div class="form-group">
+									<label for="question_type">圖片 <span style="color: red">*</span></label>
+									<input class="form-control" name="image" id="image" >
+								</div>
+								<div class="form-group">
+									<label for="question_type">瀏覽狀態 <span style="color: red">*</span></label>
+									<input class="form-control" type="number" name="views" id="views" >
+								</div>
+								<div class="form-group">
+									<label for="question_type">公佈狀態 <span style="color: red">*</span></label>
+									<select class="form-control" name="published" id="published">
+										<option value="0" selected>未發佈</option>
+										<option value="1">已發佈</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<input type="hidden" name="id" id="id">
+					<button type="button" class="btn btn-secondary" data-dismiss="modal">關 閉</button>
+					<button type="submit" class="btn btn-primary">儲 存</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+
 {% endblock content %}
 
 {% block javascript %}
@@ -61,6 +141,12 @@
 		$('#title').on('change', function () {
 			$('#slug').val(slugify($(this).val()))
 		})
+
+		function slugify(str) {
+			str = str.replace(/\s+/g, '-') // replace spaces with dashes
+			str = encodeURIComponent(str) // encode (it encodes chinese characters)
+			return str
+		}
 
 		$("#blogs").DataTable({
 			"responsive": true,
@@ -103,38 +189,57 @@
 	});
 
 
-	let simplemde = new SimpleMDE({element: $("#content")[0], autofocus: true})
+	// $('#content').markdownEditor();
+	// let simplemde = new SimpleMDE({ element: document.getElementById("content") });
 
 	function update_row(id) {
 
-		$.post('/update-posts', {
-			"id": id
-		}, function (data) {
-			// console.log(data)
-			$('#id').val(data.id)
-			$('#category_id').val(data.category_id)
-			$('#title').val(data.title)
-			$('#published').val(data.published)
-			$('#views').val(data.views)
-			$('#slug').val(data.slug)
-			image = data.image
-			if (data.image == 'None') {
-				image = ''
+		$.ajax({
+			url: '/api/blog/' + id,
+			type: 'GET',
+			success: function(data){
+
+				$('#id').val(data.id);
+				$('#category_id').val(data.category_id);
+				$('#title').val(data.title);
+				$('#published').val(data.published);
+				$('#views').val(data.views);
+				$('#slug').val(data.slug);
+				$('#image').val($.trim(data.image));
+				$('#content').text(data.content);
+
+				$('#show_update').modal();
 			}
-			$('#image').val(image)
-
-			simplemde.value('')
-			simplemde.value(data.content)
-
-			$('#show_update').modal();
 		})
+
 	}
 
-	function slugify(str) {
-		str = str.replace(/\s+/g, '-') // replace spaces with dashes
-		str = encodeURIComponent(str) // encode (it encodes chinese characters)
-		return str
-	}
+	$('#edit_add_form').on('submit', function(event){
+		event.preventDefault();
+		console.log( $( this ).serialize());
+		id = $('#id').val()
+		if(id == ''){
+			$.ajax({
+				url: '/api/blog',
+				type: 'POST',
+				data: $( this ).serialize(),
+				success: function(data){
+					location.reload();
+				}
+			})
+		} else {
+			$.ajax({
+				url: '/api/blog/' + id,
+				type: 'PUT',
+				data: $( this ).serialize(),
+				success: function(data){
+					location.reload();
+				}
+			})
+		}
+
+		return false;
+	})
 
 	function add_row() {
 		$('#id').val('')
@@ -145,19 +250,18 @@
 		$('#slug').val('')
 		$('#published').val('')
 
-		simplemde.value('')
-
 		$('#show_update').modal()
 	}
 
 	function delete_row(id) {
 		if (confirm('確定要刪除嗎？')) {
-			$.post('/delete-posts', {
-					'id': id
-				},
-				function (data) {
+			$.ajax({
+				url: '/api/blog/' + id,
+				type: 'DELETE',
+				success: function(data){
 					location.reload();
-				})
+				}
+			})
 		}
 	}
 

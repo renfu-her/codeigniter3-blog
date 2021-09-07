@@ -12,9 +12,11 @@ class Blogs extends CI_Controller
 	public function index(){
 
 		$blogs = $this->Blog_model->get_blogs();
+		$categories = $this->Categories_model->get_categories();
 
 		$data = [
-			'blogs' => $blogs
+			'blogs' => $blogs,
+			'categories' => $categories,
 		];
 
 		$this->twig->output('backend/blogs/edit-browse', $data);

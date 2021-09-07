@@ -23,6 +23,8 @@
 	<!-- Custom styles for this page -->
 	<link href="/assets/backend/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 
+	{% block css %}{% endblock css %}
+
 </head>
 
 <body id="page-top">
@@ -93,7 +95,7 @@
 	<div id="content-wrapper" class="d-flex flex-column">
 
 		<!-- Main Content -->
-		<div id="content">
+		<div>
 
 			<!-- Topbar -->
 			<nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
