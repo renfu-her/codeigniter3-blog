@@ -13,10 +13,11 @@ class Blogs extends CI_Controller
 
 		$blogs = $this->Blog_model->get_blogs();
 		$categories = $this->Categories_model->get_categories();
-
+		$time = time();
 		$data = [
 			'blogs' => $blogs,
 			'categories' => $categories,
+			'time' => $time
 		];
 
 		$this->twig->output('backend/blogs/edit-browse', $data);
